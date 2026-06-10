@@ -13,7 +13,7 @@ CREATE TABLE tiquetes (
     estado VARCHAR(20)
         NOT NULL 
         DEFAULT 'pendiente'
-        CHECK (estado IN ('pendiente', 'pagado', 'cancelado')),
+        CHECK (estado IN ('pendiente', 'ganador', 'perdedor')),
     creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_tiquetes_usuario
         FOREIGN KEY (usuario_id)

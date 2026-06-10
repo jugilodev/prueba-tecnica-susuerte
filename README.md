@@ -1,326 +1,248 @@
-# prueba-tecnica-susuerte
+# Prueba Técnica Susuerte
 
-# Prueba Técnica – Desarrollador de Software
+## Descripción
 
-## Página web transaccional · susuerte.com
+Solución desarrollada para la prueba técnica de Susuerte.
 
-**Tiempo estimado:** 4 horas
+El proyecto incluye:
 
----
-
-# Contexto del problema
-
-Susuerte es un operador de juegos de suerte y azar. En su plataforma web transaccional, cada vez que un cliente realiza una apuesta se genera un tiquete: el comprobante digital de esa jugada. El tiquete registra quién apostó, cuánto dinero apostó, en qué momento y, posteriormente, cuál fue su resultado.
-
-Para esta prueba trabajarás con una versión simplificada de ese sistema, basada en dos entidades:
-
-### Usuario
-
-El cliente que juega. Tiene un saldo (dinero disponible en su cuenta) con el que paga sus apuestas.
-
-### Tiquete
-
-El registro de una apuesta. Tiene un monto (el valor apostado) y un estado que indica en qué punto del ciclo se encuentra.
-
-El estado de un tiquete puede ser:
-
-* `pendiente`: la apuesta fue registrada pero aún no se conoce el resultado (el sorteo no ha ocurrido).
-* `ganador`: la jugada resultó premiada.
-* `perdedor`: la jugada no resultó premiada.
-
-## Flujo básico que modelarás
-
-Cuando un usuario crea un tiquete, el sistema verifica que tenga saldo suficiente, descuenta el monto apostado de su saldo y registra el tiquete asociado a ese usuario.
-
-Como en este descuento intervienen dos operaciones que deben ocurrir juntas (restar saldo y crear el tiquete), es importante que se ejecuten de forma consistente: si una falla, ninguna debe quedar aplicada.
+* Parte 1: Recursividad en PHP.
+* Parte 2: Modelado, consultas e inserción SQL en PostgreSQL.
+* Parte 3: API REST para laa gestión de tiquetes.
+* Parte 4: Interfaz web utilizando HTML, CSS y JavaScript.
+* Parte 5: Uso de Git con ramas y commits incrementales.
+* Parte 6: Propuesta de mejora.
 
 ---
 
-# Instrucciones de entrega
+## Tecnologías utilizadas
 
-* Entrega un repositorio Git (GitHub o GitLab) con el historial de commits.
-* Incluye un archivo README con instrucciones de instalación, ejecución y pruebas.
-* Puedes usar Laravel (opcional). El uso de un framework no es obligatorio; valora lo que mejor te permita demostrar tus habilidades.
-* Se valora código limpio, validación de entradas, consultas preparadas (evitar SQL injection) y manejo de errores.
-
----
-
-# Parte 1 – PHP y Recursividad (20 pts)
-
-## 1.1
-
-Implementa una función recursiva:
-
-```php
-calcularPremioAcumulado(array $niveles): float
-```
-
-que recorra un árbol de premios anidados (cada nodo tiene `monto` e `hijos[]`) y retorne la suma total.
-
-**No uses bucles para recorrer la jerarquía.**
-
-### Entrada
-
-```php
-$niveles = [
-    [
-        'monto' => 1000,
-        'hijos' => [
-            [
-                'monto' => 500,
-                'hijos' => []
-            ],
-            [
-                'monto' => 250,
-                'hijos' => [
-                    [
-                        'monto' => 100,
-                        'hijos' => []
-                    ]
-                ]
-            ]
-        ]
-    ]
-];
-```
-
-### Resultado esperado
-
-```text
-1850
-```
-
-## 1.2
-
-En el README explica:
-
-* El caso base de tu recursión.
-* Qué ocurriría con una estructura muy profunda (límite de stack).
+* PHP 8.3
+* PostgreSQL 17
+* Docker
+* Docker Compose
+* JavaScript Vanilla
+* HTML5
+* CSS3
 
 ---
 
-# Parte 2 – Bases de Datos Relacionales (20 pts)
+## Requisitos
 
-## Esquema base
+* Docker Desktop
+* Git
 
-```sql
-usuarios(
-    id,
-    nombre,
-    saldo,
-    creado_en
-)
+Verificar instalación:
 
-tiquetes(
-    id,
-    usuario_id,
-    monto,
-    estado,
-    creado_en
-)
-
--- estado: 'ganador' | 'perdedor' | 'pendiente'
-```
-
-## 2.1
-
-Escribe el SQL para crear ambas tablas con:
-
-* Claves foráneas.
-* Índices apropiados.
-
-## 2.2
-
-Consulta que retorne los **3 usuarios con mayor monto total apostado en tiquetes ganadores**.
-
-Debe mostrar:
-
-* nombre
-* total
-
-## 2.3
-
-Consulta que liste los usuarios sin ningún tiquete registrado.
-
-## 2.4
-
-Explica por qué usarías una transacción al registrar un tiquete que descuenta saldo del usuario.
+docker --version
+docker compose version
+git --version
 
 ---
 
-# Parte 3 – API y Estados HTTP (25 pts)
+## Clonar el proyecto
 
-Crea un endpoint REST en PHP:
+git clone <https://github.com/jugilodev/prueba-tecnica-susuerte.git>
+cd prueba-tecnica-susuerte
 
-```http
-POST /api/tiquetes
-```
+---
 
-que reciba un JSON con el formato:
+## Configuración
 
-```json
-{
-  "usuario_id": int,
-  "monto": float
+Crear el archivo `.env` en la raíz del proyecto:
+
+DB_HOST=postgres
+DB_PORT=5432
+DB_NAME=susuerte
+DB_USER=postgres
+DB_PASSWORD=postgres
+
+---
+
+## Levantar los servicios
+
+Construir e iniciar los contenedores:
+
+    docker compose up -d --build
+
+Verificar que los servicios estén activos:
+
+    docker compose ps
+
+---
+
+## Verificar esquema de base de datos
+
+Conectarse a PostgreSQL:
+
+docker compose exec postgres psql -U postgres -d susuerte
+
+Ejecutar el comando:
+
+\dt
+
+debe de aparecer:
+
+List of relations
+ Schema |   Name   | Type  |  Owner
+--------+----------+-------+----------
+ public | tiquetes | table | postgres
+ public | usuarios | table | postgres
+(2 rows)
+
+También es posible ejecutarlos desde DBeaver.
+
+Verificar que se hizo correctamente el insert con el siguiente comando:
+
+SELECT * FROM usuarios;
+
+Debe aparecer 4 filas
+
+SELECT * FROM tiquetes;
+
+Debe aparecer 2 filas.
+
+Para salir de la consola del contenedor ejecutar:
+
+\q
+
+## Solución parte 1
+
+La función calcularPremioAcumulado() utiliza recursividad para recorrer una estructura jerárquica de premios donde cada nodo contiene un monto y una lista de hijos.
+
+Caso base
+
+El caso base ocurre cuando el arreglo recibido está vacío:
+
+if (empty($niveles)) {
+    return 0;
 }
-```
 
-## 3.1
+En ese momento no existen más nodos por recorrer y la función finaliza retornando cero.
 
-El endpoint debe responder con los siguientes códigos:
+Funcionamiento
 
-| Situación                        | Código HTTP |
-| -------------------------------- | ----------- |
-| Tiquete creado correctamente     | 201         |
-| JSON inválido o campos faltantes | 400         |
-| Usuario no existe                | 404         |
-| Saldo insuficiente               | 422         |
-| Error inesperado del servidor    | 500         |
+Para cada nodo se realiza la suma de:
 
-## 3.2
+El monto del nodo actual.
+La suma acumulada de todos sus hijos.
+La suma acumulada de los nodos hermanos restantes.
 
-Al crear el tiquete debe descontar el monto del saldo del usuario dentro de una transacción.
+Esto permite recorrer toda la estructura sin utilizar ciclos explícitos.
 
-## 3.3
+Estructuras muy profundas
 
-Crea un endpoint:
+Si la jerarquía tuviera muchos niveles anidados, la recursión podría alcanzar el límite de llamadas de la pila de ejecución (stack), provocando un error conocido como stack overflow.
 
-```http
+En escenarios reales con estructuras extremadamente profundas podría ser preferible utilizar una solución iterativa basada en una pila (stack) explícita para evitar dicho problema.
+
+Para ejecutar el script ejecutar el siguiente comando en la terminal:
+
+    docker compose exec php php "Parte 1/script.php"
+
+## Solucion Parte 2
+
+Ejecutar querys para realizar las consultas mencionadas en la prueba ténica con el siguiente comando:
+
+    docker compose exec postgres psql -U postgres -d susuerte -f /docker-entrypoint-initdb.d/03_query.sql
+
+# Probar la API
+
+## Iniciar servidor PHP
+
+docker compose exec php php -S 0.0.0.0:8000 router.php
+
+## Crear tiquete
+
+Endpoint:
+
+POST /api/tiquetes
+
+Ejemplo:
+
+{
+  "usuario_id": 1,
+  "monto": 10000
+}
+
+Posibles respuestas:
+
+| Código | Descripción                     |
+| ------ | ------------------------------- |
+| 201    | Tiquete creado                  |
+| 400    | JSON inválido o datos faltantes |
+| 404    | Usuario no encontrado           |
+| 422    | Saldo insuficiente              |
+| 500    | Error interno                   |
+
+---
+
+## Consultar tiquetes
+
+Endpoint:
+
 GET /api/usuarios/{id}/tiquetes
-```
 
-que devuelva la lista en formato JSON con el código de estado adecuado (incluye el caso de usuario inexistente).
+Ejemplo:
 
----
-
-# Parte 4 – JavaScript (15 pts)
-
-Crea una página:
-
-```text
-index.html
-```
-
-que:
-
-## 4.1
-
-Tenga un formulario para enviar un tiquete (`usuario_id + monto`) usando `fetch` hacia el endpoint de la Parte 3.
-
-## 4.2
-
-Muestre mensajes diferenciados al usuario según el código HTTP recibido:
-
-* éxito
-* saldo insuficiente
-* usuario no encontrado
-* error
-
-## 4.3
-
-Sin recargar la página, agregue el nuevo tiquete a una lista visible en el DOM.
+GET /api/usuarios/1/tiquetes
 
 ---
 
-# Parte 5 – Control de Versiones (10 pts)
+# Interfaz Web
 
-## 5.1
+Abrir en el navegador:
 
-El repositorio debe mostrar commits incrementales y descriptivos (no un único commit final).
+<http://localhost:8000/public/index.html>
 
-## 5.2
+Funcionalidades:
 
-Trabaja la Parte 3 en una rama:
+* Crear tiquetes mediante fetch().
+* Mostrar mensajes según el código HTTP recibido.
+* Actualizar la lista de tiquetes sin recargar la página.
 
-```text
-feature/api-tiquetes
-```
+# Decisiones técnicas
 
-y deja evidencia de su merge a `main`.
-
-## 5.3
-
-Incluye un `.gitignore` adecuado (dependencias, credenciales, etc.).
-
----
-
-# Parte 6 – Reto de Creatividad (10 pts)
-
-Esta sección es deliberadamente abierta.
-
-Propón e implementa (o documenta como propuesta razonada) una mejora libre al módulo.
-
-## Algunas ideas (no limitantes)
-
-* Idempotencia ante envíos duplicados o reintentos de red.
-* Sistema de notificaciones.
-* Dashboard de métricas.
-* Validación antifraude.
-* Gamificación.
-* Paginación.
-* Filtros en el listado.
-
-Se evalúa:
-
-* Originalidad.
-* Justificación del valor para el negocio.
-* Viabilidad.
-
-No se evalúa la complejidad.
-
-Explica por qué elegiste esa mejora.
+* Se utilizó PHP puro sin frameworks para demostrar comprensión de los conceptos fundamentales.
+* Se utilizaron consultas preparadas mediante PDO para prevenir SQL Injection.
+* Se implementaron transacciones para garantizar consistencia al descontar saldo y registrar un tiquete.
+* Docker fue utilizado para garantizar un entorno reproducible.
 
 ---
 
-# Parte 7 – Documentación (10 pts)
+# Manejo de versiones en git (Parte 5)
 
-## 7.1
+Para el desarrollo de la solución se utilizó Git como sistema de control de versiones, realizando commits incrementales y descriptivos a medida que se completaban las diferentes funcionalidades del proyecto.
 
-README claro:
+La Parte 3 (API de gestión de tiquetes) fue desarrollada en una rama independiente denominada feature/api-tiquetes, tal como lo solicita el enunciado. Una vez finalizada e integrada correctamente con el resto de componentes, se realizó el merge hacia la rama principal (main), conservando el historial de cambios y dejando evidencia del flujo de trabajo utilizado.
 
-* Cómo instalar.
-* Cómo ejecutar.
-* Cómo probar el proyecto.
-* Decisiones técnicas.
-* Supuestos.
+Este enfoque permite:
 
-## 7.2
+Mantener aislados los cambios durante el desarrollo de nuevas funcionalidades.
+Reducir riesgos de afectar código estable en la rama principal.
+Facilitar la revisión y trazabilidad de los cambios realizados.
+Mantener un historial claro y organizado del proyecto.
 
-Incluye una sección breve:
+A continuación se presenta la evidencia gráfica del historial de commits y del proceso de merge realizado entre la rama feature/api-tiquetes y la rama main.
 
-```text
-Si tuviera más tiempo...
-```
+![Historial Git](docs/image.png)
 
-describiendo:
+# Mejora propuesta (Parte 6)
 
-* Qué mejorarías.
-* Qué dejaste pendiente.
-* Por qué.
+Se propone implementar idempotencia en la creación de tiquetes mediante un identificador único por solicitud (`request_id`).
 
----
+Beneficios:
 
-# Criterios de evaluación
-
-| Competencia                            | Dónde se evalúa  |
-| -------------------------------------- | ---------------- |
-| Dominio del lenguaje PHP               | Partes 1 y 3     |
-| Recursividad y resolución de problemas | Partes 1 y 6     |
-| Manejo de bases de datos relacionales  | Parte 2 y 3.2    |
-| Gestión de APIs                        | Parte 3          |
-| Gestión de estados de respuesta HTTP   | Partes 3.1 y 4.2 |
-| Control de versiones                   | Parte 5          |
-| Manejo de JavaScript                   | Parte 4          |
-| Creatividad                            | Parte 6          |
-| Comunicación escrita                   | Parte 7 (README) |
-
-### Escala sugerida
-
-* 0 = sin evidencia
-* 1 = básico
-* 2 = competente
-* 3 = sobresaliente
+* Evita creación de apuestas duplicadas.
+* Previene descuentos dobles de saldo.
+* Mejora la confiabilidad ante reintentos de red.
+* Reduce errores operativos y reclamaciones.
 
 ---
 
-**¡Mucho éxito! Si algo no es claro, documenta tus supuestos y continúa.**
+# Si tuviera más tiempo
+
+* Implementaría autenticación y autorización.
+* Incorporaría paginación y filtros para el listado de tiquetes.
+* Implementaría logs estructurados para auditoría.
+* Agregaría validaciones antifraude básicas.
