@@ -13,6 +13,6 @@ limit 3;
 --Consulta que liste los usuarios sin ningún tiquete registrado.
 
 select u.nombre from usuarios u
-join tiquetes t on u.id = t.usuario_id
+left join tiquetes t on u.id = t.usuario_id
 where t.id is null;
 
